@@ -31,6 +31,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************************************************/
 
 #pragma once
+
 #ifdef PROTO_FOUND
 #include "msg/rs_msg/lidar_point_cloud_msg.h"
 #include "rs_driver/msg/packet_msg.h"
@@ -61,6 +62,39 @@ inline proto_msg::LidarPointCloud toProtoMsg(const LidarPointCloudMsg& rs_msg)
     proto_msg.add_data(rs_msg.point_cloud_ptr->points[i].y);
     proto_msg.add_data(rs_msg.point_cloud_ptr->points[i].z);
     proto_msg.add_data(rs_msg.point_cloud_ptr->points[i].intensity);
+  }
+
+  return proto_msg;
+}
+
+inline proto_msg::StampedPointCloud toEcalProtoMsg(const LidarPointCloudMsg& rs_msg)
+{
+  proto_msg::StampedPointCloud proto_msg;
+  if (rs_msg.point_cloud_ptr->size() == 0)
+  {
+    return proto_msg;
+  }
+  double cloud_timestamp = rs_msg.timestamp;
+#ifdef POINT_TYPE_XYZIRT
+  cloud_timestamp = rs_msg.point_cloud_ptr->points[0].timestamp;
+#endif
+  proto_msg.set_timestamp(cloud_timestamp);
+  proto_msg.set_frame_id(rs_msg.frame_id);
+  proto_msg.set_height(rs_msg.point_cloud_ptr->height);
+  proto_msg.set_width(rs_msg.point_cloud_ptr->width);
+
+  for (size_t i = 0; i < rs_msg.point_cloud_ptr->size(); i++)
+  {
+    proto_msg::PointXYZIT* point_msg = proto_msg.add_points();
+    point_msg->set_x(rs_msg.point_cloud_ptr->points[i].x);
+    point_msg->set_y(rs_msg.point_cloud_ptr->points[i].y);
+    point_msg->set_z(rs_msg.point_cloud_ptr->points[i].z);
+    point_msg->set_intensity(rs_msg.point_cloud_ptr->points[i].intensity);
+#ifdef POINT_TYPE_XYZIRT
+    point_msg->set_ring(rs_msg.point_cloud_ptr->points[i].ring);
+    float dt = rs_msg.point_cloud_ptr->points[i].timestamp - cloud_timestamp;
+    point_msg->set_timestamp(dt);
+#endif
   }
 
   return proto_msg;

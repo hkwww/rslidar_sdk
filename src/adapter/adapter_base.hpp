@@ -56,7 +56,8 @@ enum class AdapterType
   PointCloudProtoAdapter,
   PacketRosAdapter,
   PacketProtoAdapter,
-  CameraTriggerRosAdapter
+  CameraTriggerRosAdapter,
+  PointCloudEcalAdapter
 };
 class AdapterBase
 {

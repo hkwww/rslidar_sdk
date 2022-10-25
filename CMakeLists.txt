@@ -5,12 +5,17 @@ project(rslidar_sdk)
 #=======================================
 # Compile setup (ORIGINAL, CATKIN, COLCON)
 #=======================================
-set(COMPILE_METHOD CATKIN)
+set(COMPILE_METHOD ORIGINAL)
 
 #=======================================
 # Custom Point Type (XYZI, XYZIRT)
 #=======================================
-set(POINT_TYPE XYZI)
+set(POINT_TYPE XYZIRT)
+
+#=======================================
+# Data Interface Type (ROS, ECAL, RPC)
+#=======================================
+set(DATA_INTERFACE ECAL)
 
 #========================
 # Project details / setup
@@ -26,48 +31,70 @@ add_compile_options(-Wall)
 # Dependencies Setup
 #========================
 #ROS#
-find_package(roscpp 1.12 QUIET)
-if(roscpp_FOUND)
-  message(=============================================================)
-  message("-- ROS Found, Ros Support is turned On!")
-  message(=============================================================)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros1.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
-  add_definitions(-DROS_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros1.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
+if(${DATA_INTERFACE} STREQUAL "ROS")
+  find_package(roscpp 1.12 QUIET)
+  if(roscpp_FOUND)
+    message(=============================================================)
+    message("-- ROS Found, Ros Support is turned On!")
+    message(=============================================================)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros1.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
+    add_definitions(-DROS_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros1.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
 
-  find_package(roslib QUIET)
-  include_directories(${roscpp_INCLUDE_DIRS} ${roslib_INCLUDE_DIRS})
-  set(ROS_LIBS ${roscpp_LIBRARIES} ${roslib_LIBRARIES})
+    find_package(roslib QUIET)
+    include_directories(${roscpp_INCLUDE_DIRS} ${roslib_INCLUDE_DIRS})
+    set(ROS_LIBS ${roscpp_LIBRARIES} ${roslib_LIBRARIES})
 
-else(roscpp_FOUND)
-  message(=============================================================)
-  message("-- ROS Not Found, Ros Support is turned Off!")
-  message(=============================================================)
-endif(roscpp_FOUND)
+  else(roscpp_FOUND)
+    message(=============================================================)
+    message("-- ROS Not Found, Ros Support is turned Off!")
+    message(=============================================================)
+  endif(roscpp_FOUND)
 
-#ROS2#
-find_package(rclcpp QUIET)
-if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-  message(=============================================================)
-  message("-- ROS2 Found, Ros2 Support is turned On!")
-  message(=============================================================)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros2.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
-  add_definitions(-DROS2_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros2.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
-  set(CMAKE_CXX_STANDARD 14)
+  #ROS2#
+  find_package(rclcpp QUIET)
+  if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+    message(=============================================================)
+    message("-- ROS2 Found, Ros2 Support is turned On!")
+    message(=============================================================)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros2.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
+    add_definitions(-DROS2_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package_ros2.xml ${CMAKE_CURRENT_SOURCE_DIR}/package.xml COPYONLY)
+    set(CMAKE_CXX_STANDARD 14)
 
-  find_package(ament_cmake REQUIRED)
-  find_package(std_msgs REQUIRED)
-  find_package(sensor_msgs REQUIRED)
-  find_package(rslidar_msg REQUIRED)
-  find_package(pcl_conversions REQUIRED)
-  include_directories(${rclcpp_INCLUDE_DIRS})
+    find_package(ament_cmake REQUIRED)
+    find_package(std_msgs REQUIRED)
+    find_package(sensor_msgs REQUIRED)
+    find_package(rslidar_msg REQUIRED)
+    find_package(pcl_conversions REQUIRED)
+    include_directories(${rclcpp_INCLUDE_DIRS})
 
-else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
-  message(=============================================================)
-  message("-- ROS2 Not Found, Ros2 Support is turned Off!")
-  message(=============================================================)
-endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+  else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+    message(=============================================================)
+    message("-- ROS2 Not Found, Ros2 Support is turned Off!")
+    message(=============================================================)
+  endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+
+elseif (${DATA_INTERFACE} STREQUAL "ECAL")
+  find_package(eCAL REQUIRED)
+  if(eCAL_FOUND)
+    message(=============================================================)
+    message("-- eCAL Found, eCAL Support is turned On!")
+    message(=============================================================)
+    add_definitions(-DECAL_FOUND)
+  else(eCAL_FOUND)
+    message(=============================================================)
+    message("-- eCAL Not Found, eCAL Support is turned Off!")
+    message(=============================================================)  
+
+  endif(eCAL_FOUND)
+
+
+
+
+elseif (${DATA_INTERFACE} STREQUAL "RPC")
+
+endif()
 
 #Protobuf#
 find_package(Protobuf QUIET)
@@ -95,7 +122,12 @@ else(NOT PROTOC MATCHES "NOTFOUND" AND Protobuf_FOUND)
 endif(NOT PROTOC MATCHES "NOTFOUND" AND Protobuf_FOUND)
 
 #Others#
-find_package(yaml-cpp REQUIRED)
+# find_package(yaml-cpp REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML_CPP REQUIRED yaml-cpp>=0.5)
+include_directories(${YAML_INCLUDE_DIRS})
+
+
 find_package(PCL QUIET REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -206,3 +238,9 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   )
   ament_package()
 endif(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
+
+
+#eCAL#
+if(eCAL_FOUND)
+  target_link_libraries(rslidar_sdk_node eCAL::core)
+endif(eCAL_FOUND)

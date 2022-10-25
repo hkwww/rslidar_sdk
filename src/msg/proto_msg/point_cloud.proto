@@ -1,16 +1,32 @@
-syntax="proto2";
+syntax = "proto2";
 package proto_msg;
 
 message LidarPointCloud
-{ 
- optional double timestamp = 1; 
- optional uint32 seq = 2;
- optional string frame_id = 3;
- optional uint32 height=4;
- optional uint32 width=5;
- optional bool is_dense=6;
- repeated float data = 7;
-
+{
+  optional double timestamp = 1;
+  optional uint32 seq = 2;
+  optional string frame_id = 3;
+  optional uint32 height = 4;
+  optional uint32 width = 5;
+  optional bool is_dense = 6;
+  repeated float data = 7;
 }
 
+message PointXYZIT
+{
+  optional float x = 1;
+  optional float y = 2;
+  optional float z = 3;
+  optional uint32 ring = 4 [default = 0];
+  optional uint32 intensity = 5 [default = 0];
+  optional float timestamp = 6 [default = 0];
+}
 
+message StampedPointCloud
+{
+  optional double timestamp = 1;
+  optional string frame_id = 2;
+  optional uint32 height = 3;
+  optional uint32 width = 4;
+  repeated PointXYZIT points = 5;
+}

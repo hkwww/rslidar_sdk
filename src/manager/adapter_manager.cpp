@@ -50,6 +50,7 @@ void AdapterManager::init(const YAML::Node& config)
   bool send_point_cloud_proto;
   bool send_packet_proto;
   bool send_camera_trigger_ros;
+  bool send_point_cloud_ecal;
   std::string pcap_dir;
   double pcap_rate;
   bool pcap_repeat;
@@ -60,6 +61,7 @@ void AdapterManager::init(const YAML::Node& config)
   yamlRead<bool>(common_config, "send_point_cloud_proto", send_point_cloud_proto, false);
   yamlRead<bool>(common_config, "send_packet_proto", send_packet_proto, false);
   yamlRead<bool>(common_config, "send_camera_trigger_ros", send_camera_trigger_ros, false);
+  yamlRead<bool>(common_config, "send_point_cloud_ecal", send_point_cloud_ecal, false);
   yamlRead<std::string>(common_config, "pcap_path", pcap_dir, "");
   yamlRead<double>(common_config, "pcap_rate", pcap_rate, 1);
   yamlRead<bool>(common_config, "pcap_repeat", pcap_repeat, true);
@@ -240,6 +242,19 @@ void AdapterManager::init(const YAML::Node& config)
       point_cloud_receive_adapter_vec_[i]->regRecvCallback(
           std::bind(&AdapterBase::sendCameraTrigger, transmitter_ptr, std::placeholders::_1));
     }
+    if (send_point_cloud_ecal)
+    {
+      RS_DEBUG << "------------------------------------------------------" << RS_REND;
+      RS_DEBUG << "Send PointCloud To : eCAL" << RS_REND;
+      RS_DEBUG << "PointCloud Port:  " << lidar_config[i]["proto"]["point_cloud_send_port"].as<uint16_t>() << RS_REND;
+      RS_DEBUG << "Target IP: " << lidar_config[i]["proto"]["point_cloud_send_ip"].as<std::string>() << RS_REND;
+      RS_DEBUG << "------------------------------------------------------" << RS_REND;
+      lidar_config[i]["send_point_cloud_proto"] = true;
+      AdapterBase::Ptr transmitter_ptr = createTransmitter(lidar_config[i], AdapterType::PointCloudEcalAdapter);
+      point_cloud_transmit_adapter_vec_.emplace_back(transmitter_ptr);
+      point_cloud_receive_adapter_vec_[i]->regRecvCallback(
+          std::bind(&AdapterBase::sendPointCloud, transmitter_ptr, std::placeholders::_1));
+    }
   }
 }
 
@@ -388,6 +403,16 @@ std::shared_ptr<AdapterBase> AdapterManager::createTransmitter(const YAML::Node&
       break;
 #else
       RS_ERROR << "ROS not found! Could not use ROS functions!" << RS_REND;
+      exit(-1);
+#endif
+
+    case AdapterType::PointCloudEcalAdapter:
+#if ECAL_FOUND
+      transmitter = std::dynamic_pointer_cast<AdapterBase>(std::make_shared<PointCloudEcalAdapter>());
+      transmitter->init(config);
+      break;
+#else
+      RS_ERROR << "eCAL not found! Could not use eCAL functions!" << RS_REND;
       exit(-1);
 #endif
 

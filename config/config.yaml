@@ -6,9 +6,10 @@ common:
                                                         #4: packet message comes from Protobuf-UDP
                                                         #5: point cloud comes from Protobuf-UDP
   send_packet_ros: false                                #true: Send packets through ROS or ROS2(Used to record packet)
-  send_point_cloud_ros: true                            #true: Send point cloud through ROS or ROS2
+  send_point_cloud_ros: false                            #true: Send point cloud through ROS or ROS2
   send_packet_proto: false                              #true: Send packets through Protobuf-UDP
   send_point_cloud_proto: false                         #true: Send point cloud through Protobuf-UDP
+  send_point_cloud_ecal: true                           #true: Send point cloud through eCAL
   pcap_path: /home/robosense/lidar.pcap                 #The path of pcap file
 lidar:
   - driver:
@@ -36,6 +37,8 @@ lidar:
       difop_send_port: 60023                           #Port number which the difop packets will be send to 
       point_cloud_send_ip: 127.0.0.1                   #Ip address which the point cloud will be send to 
       packet_send_ip: 127.0.0.1                        #Ip address which the lidar packets will be send to
+    ecal:
+      ecal_send_point_cloud_topic: /rslidar_points     #Topic used to send point cloud through eCAL
 
 
 

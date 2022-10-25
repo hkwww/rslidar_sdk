@@ -76,6 +76,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "adapter/point_cloud_ros_adapter.hpp"
 #include "adapter/packet_protobuf_adapter.hpp"
 #include "adapter/point_cloud_protobuf_adapter.hpp"
+#include "adapter/point_cloud_ecal_adapter.hpp"
 #include "adapter/camera_trigger_adapter.hpp"
 
 namespace robosense
