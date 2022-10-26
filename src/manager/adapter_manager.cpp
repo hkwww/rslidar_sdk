@@ -249,7 +249,7 @@ void AdapterManager::init(const YAML::Node& config)
       RS_DEBUG << "PointCloud Port:  " << lidar_config[i]["proto"]["point_cloud_send_port"].as<uint16_t>() << RS_REND;
       RS_DEBUG << "Target IP: " << lidar_config[i]["proto"]["point_cloud_send_ip"].as<std::string>() << RS_REND;
       RS_DEBUG << "------------------------------------------------------" << RS_REND;
-      lidar_config[i]["send_point_cloud_proto"] = true;
+      lidar_config[i]["send_point_cloud_ecal"] = true;
       AdapterBase::Ptr transmitter_ptr = createTransmitter(lidar_config[i], AdapterType::PointCloudEcalAdapter);
       point_cloud_transmit_adapter_vec_.emplace_back(transmitter_ptr);
       point_cloud_receive_adapter_vec_[i]->regRecvCallback(

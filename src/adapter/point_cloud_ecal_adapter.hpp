@@ -67,6 +67,7 @@ inline void PointCloudEcalAdapter::init(const YAML::Node& config)
 
 inline void PointCloudEcalAdapter::sendPointCloud(const LidarPointCloudMsg& msg)
 {
+  // RS_MSG << "Send ecal protobuf " << RS_REND;
   point_cloud_pub_.Send(toEcalProtoMsg(msg));
 }
 

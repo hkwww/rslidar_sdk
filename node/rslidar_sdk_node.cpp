@@ -37,6 +37,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/package.h>
 #endif
 
+#ifdef ECAL_FOUND
+#include <ecal/ecal.h>
+#endif
+
 using namespace robosense::lidar;
 std::mutex g_mtx;
 std::condition_variable g_cv;
@@ -65,6 +69,11 @@ int main(int argc, char** argv)
 
 #ifdef ROS2_FOUND
   rclcpp::init(argc, argv);
+#endif
+
+#ifdef ECAL_FOUND
+  eCAL::Initialize(argc, argv, "rslidar_sdk_node");
+  eCAL::Util::EnableLoopback(true);
 #endif
 
   std::string config_path;
@@ -106,6 +115,10 @@ int main(int argc, char** argv)
 #else
   std::unique_lock<std::mutex> lck(g_mtx);
   g_cv.wait(lck);
+#endif
+
+#ifdef ECAL_FOUND
+  eCAL::Finalize();
 #endif
   return 0;
 }
