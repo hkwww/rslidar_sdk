@@ -41,7 +41,7 @@ git submodule update
 
 ## 3 依赖介绍
 
-### 3.1 ROS 
+### 3.1 ROS (可选)
 
 *若需在ROS环境下使用雷达驱动，则需安装ROS相关依赖库*
 
@@ -55,7 +55,7 @@ Ubuntu 20.04 - ROS noetic desktop-full
 
 **如果安装了ROS kinetic desktop-full版、ROS melodic desktop-full版或ROS noetic desktop-full，那么兼容版本其他依赖库也应该同时被安装了，所以不需要重新安装它们以避免多个版本冲突引起的问题, 因此，强烈建议安装desktop-full版，这将节省大量的时间来逐个安装和配置库**。
 
-### 3.2 ROS2
+### 3.2 ROS2 (可选)
 
 *若需在ROS2环境下使用雷达驱动，则需安装ROS2相关依赖库*
 
@@ -75,7 +75,19 @@ Ubuntu 20.04 - ROS2 Galactic desktop
 
 **注意！ 请避免在同一台电脑上同时安装ROS和ROS2， 这可能会产生冲突！ 同时还需要手动安装Yaml库。**
 
-### 3.3 Yaml (必需)
+### 3.3 eCAL (可选)
+
+若在非ROS环境下运行使用雷达驱动，可以选择eCAL相关依赖库
+
+安装方式：
+
+```bash
+sudo add-apt-repository ppa:ecal/ecal-latest
+sudo apt-get update
+sudo apt-get install ecal -y
+```
+
+### 3.4 Yaml (必需)
 
 版本号:  >= v0.5.2 
 
@@ -88,7 +100,7 @@ sudo apt-get update
 sudo apt-get install -y libyaml-cpp-dev
 ```
 
-### 3.4 Pcap (必需)
+### 3.5 Pcap (必需)
 
 版本号： >=v1.7.4
 
@@ -98,7 +110,7 @@ sudo apt-get install -y libyaml-cpp-dev
 sudo apt-get install -y  libpcap-dev
 ```
 
-### 3.5 Protobuf (可选)
+### 3.6 Protobuf (可选)
 
 版本号： >=v2.6.1
 
@@ -106,6 +118,16 @@ sudo apt-get install -y  libpcap-dev
 
 ```sh
 sudo apt-get install -y libprotobuf-dev protobuf-compiler
+```
+
+### 3.7 PCL (必须)
+
+*若已安装ROS desktop-full, 可跳过*
+
+安装方式:
+
+```bash
+sudo apt-get install libpcl-dev
 ```
 
 

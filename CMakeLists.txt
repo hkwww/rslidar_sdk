@@ -89,9 +89,6 @@ elseif (${DATA_INTERFACE} STREQUAL "ECAL")
 
   endif(eCAL_FOUND)
 
-
-
-
 elseif (${DATA_INTERFACE} STREQUAL "RPC")
 
 endif()
